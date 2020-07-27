@@ -29,6 +29,7 @@ public class SynchedThreadPrinter implements Runnable{
 			try {
 				threadLock.wait(); //pauses execution until another thread calls notify using threadLock
 			} catch (InterruptedException e) {
+				
 				System.out.println("error!");
 			}
 			

@@ -23,56 +23,60 @@ public class SynchedSplitLoops {
 	static int counter = 0;
 
 	public static void main(String[] args) {
-		// synchronized value
-		synchronized (threadLock) {
-			// increasing t1
-			Thread t1 = new Thread(() -> {
-				for (int i = 0; i < 100000; i++) {
 
+		Thread t1 = new Thread(() -> {
+
+			synchronized (threadLock) {
+				
+				//System.out.println("Thread 1 " + counter);
+				for (int i = 0; i < 1000; i++) {
+					
+					threadLock.notify();
 					counter++;
+					System.out.println("Thread 1 " + counter);
+
+					try {
+						threadLock.wait();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
-			});
+			}
+		});
 
-			Thread t2 = new Thread(() -> {
-				for (int i = 0; i < 100000; i++) {
-					System.out.println(counter);
+		
+		
+		//threadLock.notify();
+		Thread t2 = new Thread(() -> {
+			
+			synchronized (threadLock) {
+				//System.out.println("Thread 2 " + counter);
+				for (int i = 0; i < 1000; i++) {
+					
+					threadLock.notify();
+					System.out.println("Thread 2 " + counter);
+					try {
+						threadLock.wait();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
-			});
-
-			
-			
-			// t1.start();
-			//t2.start();
-
-			System.out.println("Thread 1 " + counter);
-			threadLock.notify();
-			
-			try {
-				t1.start();
-				t1.join();
-				threadLock.wait();
-			} catch (InterruptedException e) {
-				System.err.println("Could not join threads");
 			}
+		});
 
-			System.out.println("Thread 2 " + counter);
-			threadLock.notify();
-			try {
-				t2.start();
-				t2.join();
-				threadLock.wait();
-			} catch (InterruptedException e) {
-				System.err.println("Could not join threads");
-			}
-			
-			
-			//try {
-			//	t1.join();
-			//	t2.join();
-			//} catch (InterruptedException e) {
-			//	System.err.println("Could not join threads");
-			//}
+		t1.start();
+		t2.start();
+
+		try {
+			t1.join();
+			t2.join();
+			threadLock.wait();
+		} catch (InterruptedException e) {
+			System.err.println("Could not join threads");
 		}
 
 	}
+
 }
